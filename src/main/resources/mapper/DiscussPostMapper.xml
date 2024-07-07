@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yuanmh.community.dao.DiscussPostMapper">
+    <sql id="selectFiels">
+        id
+        , user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+    <sql id="insertFields">
+        user_id
+        , title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <!--     查询帖子 并且分页查询 如果没有传入userId 则查询所有帖子-->
+    <select id="selectDiscussPosts" resultType="DiscussPost">
+        select
+        <include refid="selectFiels"></include>
+        from discuss_post
+        where status !=2
+        <if test="userId!= null">
+            and user_id = #{userId}
+        </if>
+        order by type desc, create_time desc
+        limit #{offset}, #{limit}
+    </select>
+    <!--    动态拼接id 如果没有传入id 则查询所有帖子-->
+    <select id="selectDiscussPostRows" resultType="java.lang.Integer">
+        select
+        count(*)
+        from discuss_post
+        where status !=2
+        <if test="userId!= null">
+            and user_id = #{userId}
+        </if>
+    </select>
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        select
+        <include refid="selectFiels"></include>
+        from discuss_post where id = #{id}
+    </select>
+
+    <!--   动态插入sql-->
+    <insert id="insertDiscussPost" parameterType="DiscussPost">
+        insert into discuss_post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!= null">
+                user_id,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="content!= null">
+                content,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="status!= null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="commentCount != null">
+                comment_count,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="title != null">
+                #{title},
+            </if>
+            <if test="content != null">
+                #{content},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="commentCount != null">
+                #{commentCount},
+            </if>
+            <if test="score != null">
+                #{score},
+            </if>
+        </trim>
+    </insert>
+
+    <!--    更新帖子回复数量-->
+    <update id="updateCommentCount">
+        update discuss_post
+        set comment_count = #{commentCount}
+        where id = #{id}
+    </update>
+
+</mapper>

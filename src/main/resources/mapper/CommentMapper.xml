@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yuanmh.community.dao.CommentMapper">
+    <sql id="selectFields">
+        id
+        , user_id, entity_type ,entity_id, target_id, content, status,create_time
+    </sql>
+
+    <select id="selectByEntity" resultType="Comment">
+        select
+        <include refid="selectFields"/>
+        from comment
+        where entity_type = #{entityType} and entity_id = #{entityId} and status = 0
+        order by create_time asc
+        limit #{offset}, #{limit}
+    </select>
+    <select id="selectCountByEntity" resultType="java.lang.Integer">
+        select count(id)
+        from comment
+        where entity_type = #{entityType}
+          and entity_id = #{entityId}
+          and status = 0
+    </select>
+
+    <select id="selectCommentById" resultType="Comment">
+        select
+        <include refid="selectFields"/>
+        from comment where id = #{id}
+    </select>
+
+    <!--    动态插入sql
+    user_id, entity_type ,entity_id, target_id, content, status,create_time-->
+    <insert id="insertComment" parameterType="Comment">
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!= null">
+                user_id,
+            </if>
+            <if test="entityType!= null">
+                entity_type,
+            </if>
+            <if test="entityId!= null">
+                entity_id,
+            </if>
+            <if test="targetId!= null">
+                target_id,
+            </if>
+            <if test="content!= null">
+                content,
+            </if>
+            <if test="status!= null">
+                status,
+            </if>
+            <if test="createTime!= null">
+                create_time,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!= null">
+                #{userId},
+            </if>
+            <if test="entityType!= null">
+                #{entityType},
+            </if>
+            <if test="entityId!= null">
+                #{entityId},
+            </if>
+            <if test="targetId!= null">
+                #{targetId},
+            </if>
+            <if test="content!= null">
+                #{content},
+            </if>
+            <if test="status!= null">
+                #{status},
+            </if>
+            <if test="createTime!= null">
+                #{createTime},
+            </if>
+        </trim>
+
+    </insert>
+
+
+</mapper>
